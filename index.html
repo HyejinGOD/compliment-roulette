@@ -5,11 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>칭찬은 룰렛을 춤추게 한다했어요</title>
     <style>
-        /* 1. CSS 스타일 영역 */
+        /* 1. CSS 스타일 영역 (V20과 동일) */
+        :root {
+            --color-blue: #1A73E8;
+            --color-green: #00A86B;
+            --color-pink: #FF66A3;
+            --color-fail: #C0392B;
+            --color-accent: #FFD700;
+        }
+
         body {
-            /* 폰트: 시스템 기본 고딕체 사용으로 안정성 확보 */
             font-family: 'Malgun Gothic', 'Gulim', sans-serif;
-            background-color: #FFEE99;
+            background-color: #f0f0f0;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -22,17 +29,17 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 90%;
-            max-width: 900px;
+            width: 95%;
+            max-width: 1000px;
             background-color: #FFF;
-            padding: 20px;
+            padding: 30px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
         }
 
         #main-title {
             color: #333;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             font-size: 2.5em;
             text-align: center;
         }
@@ -54,17 +61,17 @@
             font-weight: bold;
         }
 
-        input {
-            width: calc(100% - 20px);
+        input, textarea {
+            width: calc(100% - 22px);
             padding: 10px;
             margin-top: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-family: inherit; /* 부모 요소의 폰트 상속 */
+            font-family: inherit;
         }
 
         button {
-            background-color: #FF66A3; /* 핑크색 */
+            background-color: var(--color-blue);
             color: white;
             padding: 12px 20px;
             border: none;
@@ -78,7 +85,7 @@
         }
 
         button:hover:not(:disabled) {
-            background-color: #E64D8B;
+            background-color: #1766cc;
             transform: translateY(-1px);
         }
 
@@ -89,34 +96,34 @@
 
         /* 체험 모드 버튼 */
         #guest-login-btn {
-            background-color: #1A73E8; /* 구글 블루 */
-            margin-top: 10px;
+            background-color: var(--color-accent);
+            color: #333;
         }
         #guest-login-btn:hover {
-            background-color: #1766cc;
+            background-color: #E6C500;
         }
-
 
         /* 대시보드 및 룰렛 영역 */
         #dashboard-container {
             display: none;
             width: 100%;
-            max-width: 850px;
+            max-width: 900px;
             margin-top: 20px;
         }
 
         #student-info {
-            background-color: #F8F8F8;
             padding: 15px;
+            background-color: #fff8e1;
             border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 5px solid #FFD700;
+            font-size: 1.2em;
+            border: 1px solid var(--color-accent);
         }
         
         #current-count {
             float: right;
             font-weight: bold;
-            color: #1a73e8;
+            color: var(--color-blue);
         }
 
         #praise-roulette-area {
@@ -134,102 +141,162 @@
             flex: 1;
             min-width: 350px;
         }
-
-        /* 룰렛 시각 효과 스타일 */
-        #roulette-visual {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        #reward-options {
-            border: 3px solid #FFD700;
-            padding: 15px 5px;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-around;
-            background-color: #FFFDD0;
-        }
-        .option {
+        
+        /* 새 요소: 칭찬글 작성 완료 후 메시지 영역 */
+        #praise-message-area {
+            margin-top: 15px;
             font-weight: bold;
-            font-size: 1.1em;
-            padding: 5px 10px;
-            transition: background-color 0.5s;
+            color: var(--color-pink);
+            min-height: 1.2em; 
         }
 
-        /* 룰렛 애니메이션 키프레임 */
-        @keyframes spin {
-            0% { transform: translateX(0%); }
-            10% { transform: translateX(-100%); }
-            20% { transform: translateX(0%); }
-            30% { transform: translateX(-200%); }
-            40% { transform: translateX(-50%); }
-            50% { transform: translateX(-150%); }
-            60% { transform: translateX(0%); }
-            70% { transform: translateX(-100%); }
-            80% { transform: translateX(-200%); }
-            90% { transform: translateX(-100%); }
-            100% { transform: translateX(0%); }
+        /* 룰렛 시각 요소 */
+        #roulette-visual {
+            position: relative;
+            margin: 20px auto;
+            width: 300px;
+            height: 300px;
         }
 
-        /* 룰렛 애니메이션 적용 클래스 */
-        .spinning {
-            animation: spin 1.5s ease-in-out forwards;
+        /* 룰렛 배경 (3등분 그라데이션) */
+        #roulette-wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: absolute;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0s;  
+            
+            /* 파란색(0-120, 2개), 초록색(120-240, 꽝), 핑크색(240-360, 1개) */
+            background: conic-gradient(
+                var(--color-blue) 0% 120deg,     
+                var(--color-green) 120deg 240deg,      
+                var(--color-pink) 240deg 360deg     
+            );
+        }
+
+        /* 텍스트 컨테이너 (중앙 정렬) */
+        .slice-text {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 50%;
+            left: 50%;
+            transform-origin: 0 0;  
         }
         
-        #spin-roulette-btn {
-            background-color: #FFD700;
-            color: #333;
-            padding: 15px 30px;
-            border-radius: 50px;
+        /* 텍스트 내용 공통 */
+        .slice-text span {
+            display: block;
+            position: absolute;
+            color: white;
+            font-size: 1.2em;  
             font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+            white-space: nowrap;
+            
+            /* 위치 조정 */
+            transform: translate(-50%, -50%) translateY(-55px) rotate(90deg); 
         }
 
+        /* 파란색 영역 (2개) 텍스트 스타일 */
+        .slice-text:nth-child(1) span {
+            letter-spacing: -1px; 
+            font-size: 1.25em; 
+            transform: translate(-50%, -50%) translateY(-50px) rotate(90deg); 
+        }
+        
+        /* 핑크색 영역 (1개) 텍스트 스타일 */
+        .slice-text:nth-child(3) span {
+             /* 1개는 조금 더 중앙으로 이동 */
+            transform: translate(-50%, -50%) translateY(-50px) rotate(90deg); 
+        }
+
+        /* 텍스트 컨테이너 회전 */
+        .slice-text:nth-child(1) { transform: rotate(60deg); }   
+        .slice-text:nth-child(2) { transform: rotate(180deg); } 
+        .slice-text:nth-child(3) { transform: rotate(300deg); } 
+
+        /* 중앙 포인터 */
+        #roulette-pointer {
+            position: absolute;
+            top: 0px;  
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid var(--color-fail);  
+            z-index: 10;
+        }
+
+        /* 결과 표시 (룰렛 결과 전용) */
         #result-display {
             margin-top: 20px;
-            font-size: 1.5em;
+            font-size: 1.8em;
             font-weight: bold;
-            min-height: 1.5em;
+            min-height: 1.8em;
+            text-align: center;
         }
 
+        /* 칭찬글 제출 버튼 (핑크색) */
+        #submit-praise-btn {
+            background-color: var(--color-pink);
+        }
+        #submit-praise-btn:hover:not(:disabled) {
+            background-color: #E64D8B;
+        }
+
+        /* 룰렛 돌리기 버튼 (파란색) */
+        #spin-roulette-btn {
+            background-color: var(--color-blue);
+        }
+
+        /* 2회 완료 후 점수 표시 영역 */
         #total-score-box {
             display: none;
             margin-top: 30px;
             padding: 20px;
             background-color: #DCF8C6;
-            border: 2px solid #00A86B;
+            border: 2px solid var(--color-green);
             border-radius: 10px;
             text-align: center;
+            width: 100%;
+            max-width: 850px;
         }
         #total-score {
             font-size: 2em;
             font-weight: bold;
-            color: #00A86B;
+            color: var(--color-green);
         }
     </style>
 </head>
 <body>
     <div id="app-container">
-        <h1 id="main-title">칭찬은 룰렛을 춤추게 한 <span style="color: #FFD700;">다했어요</span></h1>
+        <h1 id="main-title">칭찬은 룰렛을 춤추게 한<span style="color: var(--color-accent);">다했어요</span></h1>
 
         <div id="login-form-box" class="form-box">
-            <h2>학생 대시보드 접속</h2>
-            <p style="color: red;">[필수] API 키와 학생 코드를 입력해야 접속할 수 있습니다.</p>
+            <h2>학생 대시보드 접속 (API 연동)</h2>
+            <p style="color: var(--color-fail);">[필수] API 키와 학생 코드를 입력해야 **실제 쿠키를 연동**할 수 있습니다.</p>
             <label for="apiKey">API 키 (X-API-Key)</label>
             <input type="text" id="apiKey" placeholder="발급받은 API 키">
 
             <label for="studentCode">학생 코드</label>
             <input type="text" id="studentCode" placeholder="조회할 학생 코드">
 
-            <button onclick="loginStudent()">대시보드 확인 (실제 쿠키 반영)</button>
+            <button id="login-student-btn">대시보드 확인 (실제 쿠키 반영)</button>
             
             <p style="margin-top: 25px; text-align: center; color: #777;">또는</p>
 
-            <button id="guest-login-btn" onclick="startGuestMode()">체험 모드 시작 (쿠키 가상 반영)</button>
+            <button id="guest-login-btn">체험판 (기능만 테스트)</button>
         </div>
 
         <div id="dashboard-container">
             <div id="student-info">
                 안녕하세요, <span id="studentName" style="font-weight: bold;"></span> <span id="mode-label"></span>!
-                <br>현재 남은 쿠키: <span id="currentCookiesDisplay" style="font-weight: bold; color: #00A86B;">0</span>개
+                <br>현재 남은 쿠키: <span id="currentCookiesDisplay" style="font-weight: bold; color: var(--color-green);">0</span>개
                 <span id="current-count"></span>
             </div>
 
@@ -237,265 +304,307 @@
                 총 2회의 룰렛 이벤트가 종료되었습니다.
                 <p>이번 룰렛 이벤트에서 획득한 **총 쿠키 점수**는</p>
                 <p id="total-score"></p>
-                <p>입니다! 수고하셨습니다.</p>
+                <p>입니다! 수고하셨습니다. (새로고침하면 다시 시작됩니다)</p>
             </div>
 
             <div id="praise-roulette-area">
                 <div id="praise-form-box">
                     <h2>칭찬글 쓰기</h2>
                     <form id="praise-form">
-                        <label for="who">누가 *</label>
-                        <input type="text" id="who" required placeholder="칭찬 대상 (예: 철수)">
+                        <label for="praise_who">누가 *</label>
+                        <input type="text" id="praise_who" required placeholder="칭찬 대상 (예: 철수)">
 
-                        <label for="when">언제 *</label>
-                        <input type="text" id="when" required placeholder="구체적 시점 (예: 어제 점심시간)">
+                        <label for="praise_when">언제 *</label>
+                        <input type="text" id="praise_when" required placeholder="구체적 시점 (예: 어제 점심시간)">
 
-                        <label for="what">무엇을 *</label>
-                        <input type="text" id="what" required placeholder="구체적 행동 (예: 넘어진 나를 일으켜줌)">
+                        <label for="praise_what">무엇을 *</label>
+                        <textarea id="praise_what" required placeholder="구체적 행동 (예: 넘어진 나를 일으켜줌)"></textarea>
 
-                        <label for="where">어디서 (선택)</label>
-                        <input type="text" id="where" placeholder="장소 (예: 운동장)">
-                        
-                        <label for="how">어떻게 (선택)</label>
-                        <input type="text" id="how" placeholder="행동 방식/태도 (예: 웃는 얼굴로)">
-
-                        <p id="guide-text">* 필수 3가지 항목을 구체적으로 쓰면 통과 확률 UP!</p>
+                        <p id="guide-text" style="font-size: 0.9em; margin-top: 10px; color: #777;">* 필수 3가지 항목을 **2글자 이상 구체적**으로 쓰면 통과 확률 UP!</p>
 
                         <button type="submit" id="submit-praise-btn">칭찬글 작성 완료</button>
                     </form>
+                    <div id="praise-message-area"></div> 
                 </div>
 
                 <div id="roulette-box">
-                    <h2>🎉 칭찬 룰렛 🎉</h2>
+                    <h2> 룰렛을 돌려라!🎯</h2>
                     <div id="roulette-visual">
-                        <p>칭찬글 작성 완료 후 룰렛을 돌려보세요.</p>
-                        <div id="reward-options">
-                            <span class="option">꽝!</span>
-                            <span class="option">쿠키 +1</span>
-                            <span class="option">쿠키 +2</span>
+                        <div id="roulette-pointer"></div>
+                        <div id="roulette-wheel">
+                            <div class="slice-text" data-color="blue"><span>🍪🍪 2개</span></div> 
+                            <div class="slice-text" data-color="green"><span>꽝💥</span></div> 
+                            <div class="slice-text" data-color="pink"><span>🍪 1개</span></div> 
                         </div>
                     </div>
                     
-                    <button id="spin-roulette-btn" disabled onclick="spinRoulette()">룰렛 돌리기!</button>
+                    <button id="spin-roulette-btn" disabled>룰렛 돌리기!</button>
                     <div id="result-display"></div>
                 </div>
             </div>
         </div>
-
-    </div>
+    </div> 
 
     <script>
-        // 2. JavaScript 로직 영역
+        (function() {
+            document.addEventListener('DOMContentLoaded', () => {
 
-        // 공통 변수
-        let currentTotalCookie = 0;
-        let studentName = "";
-        let isGuestMode = false; // 체험 모드 여부 플래그
-        
-        // 2회 제한 로직용 변수
-        let roundCount = 1;
-        const MAX_ROUNDS = 2;
-        let totalAcquiredCookies = 0;
+                // 2. JavaScript 로직 영역
+                const API_BASE_URL = 'https://api.dahandin.com/openapi/v1'; 
 
-        // DOM 요소 정의
-        const dashboardContainer = document.getElementById('dashboard-container');
-        const loginFormBox = document.getElementById('login-form-box');
-        const studentNameDisplay = document.getElementById('studentName');
-        const cookiesDisplay = document.getElementById('currentCookiesDisplay');
-        const praiseForm = document.getElementById('praise-form');
-        const submitBtn = document.getElementById('submit-praise-btn');
-        const spinBtn = document.getElementById('spin-roulette-btn');
-        const resultDisplay = document.getElementById('result-display');
-        const currentCountDisplay = document.getElementById('current-count');
-        const totalScoreBox = document.getElementById('total-score-box');
-        const totalScoreDisplay = document.getElementById('total-score');
-        const modeLabel = document.getElementById('mode-label');
-        const rewardOptions = document.getElementById('reward-options');
+                // DOM 요소
+                const dashboardContainer = document.getElementById('dashboard-container');
+                const loginFormBox = document.getElementById('login-form-box');
+                const studentNameDisplay = document.getElementById('studentName');
+                const cookiesDisplay = document.getElementById('currentCookiesDisplay');
+                const praiseForm = document.getElementById('praise-form');
+                const submitBtn = document.getElementById('submit-praise-btn');
+                const spinBtn = document.getElementById('spin-roulette-btn');
+                const resultDisplay = document.getElementById('result-display');
+                const modeLabel = document.getElementById('mode-label');
+                const rouletteWheel = document.getElementById('roulette-wheel');
+                const currentCountDisplay = document.getElementById('current-count');
+                const totalScoreBox = document.getElementById('total-score-box');
+                const totalScoreDisplay = document.getElementById('total-score');
+                const praiseRouletteArea = document.getElementById('praise-roulette-area');
+                const praiseMessageArea = document.getElementById('praise-message-area'); 
 
+                // 버튼 요소
+                const guestLoginBtn = document.getElementById('guest-login-btn');
+                const loginStudentBtn = document.getElementById('login-student-btn'); 
+                const apiKeyInput = document.getElementById('apiKey');
+                const studentCodeInput = document.getElementById('studentCode');
 
-        // =================================================================
-        // 초기화 및 카운트 업데이트
-        // =================================================================
-        function updateRoundCount() {
-            currentCountDisplay.textContent = `(현재 ${roundCount}회 / 총 ${MAX_ROUNDS}회)`;
-            if (roundCount > MAX_ROUNDS) {
-                currentCountDisplay.textContent = `(이벤트 종료)`;
-                document.getElementById('praise-roulette-area').style.display = 'none';
-                totalScoreDisplay.textContent = `${totalAcquiredCookies}개`;
-                totalScoreBox.style.display = 'block';
-            }
-        }
-        
-        function transitionToDashboard(name, currentCookies, isGuest) {
-            studentName = name;
-            currentTotalCookie = currentCookies;
-            isGuestMode = isGuest;
-            
-            studentNameDisplay.textContent = studentName;
-            cookiesDisplay.textContent = currentTotalCookie;
-            modeLabel.textContent = isGuest ? '(체험 모드)' : '학생!';
-            
-            loginFormBox.style.display = 'none';
-            dashboardContainer.style.display = 'block';
-            updateRoundCount();
-            
-            // alert 창을 여기서 제거하거나, 체험 모드에서만 실행되지 않도록 수정
-            // alert(`${studentName}님, 환영합니다! 칭찬글을 작성하고 룰렛을 돌려보세요!`); 
-            
-            // ************ ALERT 창 제거 또는 체험모드에만 적용되도록 수정 ************
-            if (isGuest) {
-                // 체험 모드는 바로 진입
-                // alert 창은 startGuestMode()에서 호출합니다.
-            } else {
-                alert(`${studentName}님, 환영합니다! 칭찬글을 작성하고 룰렛을 돌려보세요!`);
-            }
-            // *******************************************************************
-        }
+                // 전역 상태 및 2회 제한 로직
+                let currentTotalCookie = 0;
+                let isGuestMode = false;
+                let roundCount = 1; 
+                const MAX_ROUNDS = 2; 
+                let totalAcquiredCookies = 0; 
 
-        // =================================================================
-        // 1. 체험 모드 로직 (수정된 부분)
-        // =================================================================
-        function startGuestMode() {
-            transitionToDashboard('체험자', 10, true); // 가상 이름과 가상 쿠키 10개로 시작
-            
-            // 화면 전환 후 alert 호출 (순서 조정)
-            setTimeout(() => {
-                alert('체험자님, 환영합니다! 칭찬글을 작성하고 룰렛을 돌려보세요. (쿠키는 가상으로 반영됩니다.)');
-            }, 100); 
-        }
+                // 룰렛 보상 설정
+                const rewards = [
+                    { label: '🍪🍪 2개', amount: 2, minAngle: 0, maxAngle: 120, color: '#1A73E8' },  
+                    { label: '꽝❌', amount: 0, minAngle: 120, maxAngle: 240, color: '#C0392B' },   
+                    { label: '🍪 1개', amount: 1, minAngle: 240, maxAngle: 360, color: '#FF66A3' }   
+                ];
 
-        // =================================================================
-        // 2. API 로그인 로직
-        // =================================================================
-        async function loginStudent() {
-            const apiKey = document.getElementById('apiKey').value.trim();
-            const studentCode = document.getElementById('studentCode').value.trim();
-            
-            if (!apiKey || !studentCode) {
-                alert('API 키와 학생 코드를 모두 입력해 주세요.');
-                return;
-            }
+                /**
+                 * 입력값의 유효성을 검사합니다.
+                 * - 공백 제거 후 2글자 이상이어야 합니다.
+                 * - 초성만으로는 안 됩니다. (예: ㅋㅌㅊ)
+                 */
+                function validateInput(value, fieldName) {
+                    const trimmedValue = value.trim();
 
-            const url = `https://api.dahandin.com/openapi/v1/get/student/total?code=${studentCode}`;
-
-            try {
-                const response = await fetch(url, {
-                    method: "GET",
-                    headers: {
-                        "X-API-Key": apiKey
+                    // 1. 2글자 미만 검사 (공백 제외)
+                    if (trimmedValue.length < 2) {
+                        alert(`${fieldName}은(는) 2글자 이상 구체적으로 작성해 주세요.`);
+                        return false;
                     }
+
+                    // 2. 초성만으로 구성된 경우 검사 (한글 완성형이 없고 초성만 있을 경우)
+                    // 초성(ㄱ-ㅎ)만 있고, 완성형 글자(가-힣)가 없는 경우
+                    if (/[ㄱ-ㅎ]/g.test(trimmedValue) && !/[가-힣]/g.test(trimmedValue)) {
+                        alert(`${fieldName}은(는) 초성만으로는 안 됩니다. 구체적인 글자로 작성해 주세요.`);
+                        return false;
+                    }
+
+                    return true;
+                }
+
+
+                // =================================================================
+                // 1. 화면 전환 함수
+                // =================================================================
+
+                function updateRoundCount() {
+                    currentCountDisplay.textContent = `(현재 ${roundCount}회 / 총 ${MAX_ROUNDS}회)`;
+                    if (roundCount > MAX_ROUNDS) {
+                        currentCountDisplay.textContent = `(이벤트 종료)`;
+                        praiseRouletteArea.style.display = 'none';
+                        totalScoreDisplay.textContent = `${totalAcquiredCookies}개`;
+                        totalScoreBox.style.display = 'block';
+                    }
+                }
+
+                function transitionToDashboard(name, currentCookies, isGuest) {
+                    currentTotalCookie = currentCookies;
+                    isGuestMode = isGuest;
+                    
+                    studentNameDisplay.textContent = name;
+                    cookiesDisplay.textContent = currentTotalCookie;
+                    modeLabel.textContent = isGuest ? '(체험 모드)' : '학생!';
+                    
+                    loginFormBox.style.display = 'none';
+                    dashboardContainer.style.display = 'block';
+                    updateRoundCount();
+                    // 초기 메시지 표시 위치 변경
+                    praiseMessageArea.textContent = isGuest ? `체험 시작! ${roundCount}회차 칭찬글을 작성해 주세요.` : `API 연동 성공! ${roundCount}회차 칭찬글을 작성해 주세요.`;
+                    resultDisplay.textContent = ''; // 룰렛 결과 영역 초기화
+                }
+
+                function startGuestMode() {
+                    transitionToDashboard('체험자', 10, true);
+                }
+
+                // 2. API 연동 로그인 함수 (생략)
+                async function loginStudent() {
+                    const apiKey = apiKeyInput.value.trim();
+                    const studentCode = studentCodeInput.value.trim();
+
+                    if (!apiKey || !studentCode) {
+                        alert('API 키와 학생 코드를 모두 입력해 주세요.');
+                        return;
+                    }
+                    
+                    loginStudentBtn.disabled = true;
+                    loginStudentBtn.textContent = '정보 조회 중...';
+
+                    const endpoint = `/get/student/total?code=${encodeURIComponent(studentCode)}`;
+                    const url = API_BASE_URL + endpoint;
+
+                    try {
+                        const response = await fetch(url, {
+                            method: "GET",
+                            headers: {
+                                "X-API-Key": apiKey
+                            }
+                        });
+
+                        const json = await response.json();
+                        
+                        if (json.result === true) {
+                            const studentData = json.data;
+                            alert(`${studentData.name}님, 환영합니다! 현재 쿠키: ${studentData.totalCookie}개`);
+                            
+                            transitionToDashboard(studentData.name, studentData.totalCookie, false);
+
+                        } else {
+                            alert(`[API 오류] ${json.message || '정보를 불러오는데 실패했습니다. 키와 코드를 확인해주세요.'}`);
+                        }
+
+                    } catch (error) {
+                        console.error("통신 오류:", error);
+                        alert('네트워크 오류 또는 CORS 문제로 서버에 접속하지 못했습니다. F12 콘솔을 확인해주세요.');
+                        
+                    } finally {
+                        loginStudentBtn.disabled = false;
+                        loginStudentBtn.textContent = '대시보드 확인 (실제 쿠키 반영)';
+                    }
+                }
+
+
+                // =================================================================
+                // 3. 룰렛 및 이벤트 처리 (생략)
+                // =================================================================
+                
+                function getRouletteResult() {
+                    const winningAngle = Math.floor(Math.random() * 360);
+                    let finalReward = rewards[0]; 
+
+                    if (winningAngle >= 0 && winningAngle < 120) {
+                        finalReward = rewards[0]; 
+                    } else if (winningAngle >= 120 && winningAngle < 240) {
+                        finalReward = rewards[1]; 
+                    } else {
+                        finalReward = rewards[2]; 
+                    }
+                    
+                    const MIN_SPINS = 5;
+                    const BASE_DEGREES = MIN_SPINS * 360;
+                    const finalDegree = BASE_DEGREES + (360 - winningAngle); 
+                    
+                    return {
+                        reward: finalReward,
+                        finalDegree: finalDegree
+                    };
+                }
+
+                async function spinRoulette() {
+                    if (spinBtn.disabled || roundCount > MAX_ROUNDS) return;
+                    
+                    spinBtn.disabled = true;
+                    praiseMessageArea.textContent = ''; 
+                    
+                    const result = getRouletteResult();
+                    const duration = 4000; 
+
+                    resultDisplay.textContent = '... 룰렛 돌아가는 중 ...';
+                    
+                    rouletteWheel.style.transition = `transform ${duration / 1000}s cubic-bezier(0.1, 0.7, 1.0, 0.1)`;
+                    rouletteWheel.style.transform = `rotate(${result.finalDegree}deg)`;
+                    
+                    setTimeout(async () => {
+                        rouletteWheel.style.transition = 'none';
+                        const resetDegree = result.finalDegree % 360;
+                        rouletteWheel.style.transform = `rotate(${resetDegree}deg)`;
+                        
+                        const cookieAmount = result.reward.amount;
+                        
+                        // 결과 표시 시 '쿠키' 단어 포함하여 사용자에게 명확히 전달
+                        resultDisplay.textContent = `[${roundCount}회차] 결과: ${result.reward.label.includes('꽝') ? result.reward.label : `쿠키 ${result.reward.label}`} 획득!`;
+                        resultDisplay.style.color = result.reward.color;
+                        
+                        currentTotalCookie += cookieAmount;
+                        totalAcquiredCookies += cookieAmount; 
+                        cookiesDisplay.textContent = currentTotalCookie;
+                        
+                        // TODO: 실제 API 연동 시, 여기에 '쿠키 사용/증가 API' 호출 로직을 추가해야 합니다.
+
+                        roundCount++; 
+
+                        setTimeout(() => {
+                            if (roundCount <= MAX_ROUNDS) {
+                                praiseForm.reset();
+                                submitBtn.disabled = false;
+                                // 다음 칭찬글 작성 메시지를 왼쪽 영역에 표시
+                                praiseMessageArea.textContent = `다음 (${roundCount}회차) 칭찬글을 작성해 주세요.`;
+                                resultDisplay.textContent = ''; // 룰렛 결과 영역 초기화
+                                updateRoundCount();
+                            } else {
+                                updateRoundCount();
+                                resultDisplay.textContent = `이벤트가 종료되었습니다. 총 ${totalAcquiredCookies}개 쿠키 획득!`;
+                            }
+                        }, 3000);
+                    }, duration + 50);
+                }
+
+                // =================================================================
+                // 4. 이벤트 리스너 연결 영역
+                // =================================================================
+
+                guestLoginBtn.addEventListener('click', startGuestMode);
+                loginStudentBtn.addEventListener('click', loginStudent); 
+
+                praiseForm.addEventListener('submit', async (event) => {
+                    event.preventDefault(); 
+                    
+                    if (roundCount > MAX_ROUNDS) {
+                        praiseMessageArea.textContent = '이미 2회의 룰렛 이벤트 기회를 모두 사용했습니다.';
+                        return;
+                    }
+
+                    const who = document.getElementById('praise_who').value;
+                    const when = document.getElementById('praise_when').value;
+                    const what = document.getElementById('praise_what').value;
+                    
+                    // 🚩 수정된 유효성 검사 적용
+                    if (!validateInput(who, '누가')) return;
+                    if (!validateInput(when, '언제')) return;
+                    if (!validateInput(what, '무엇을')) return;
+
+                    // 유효성 검사 통과 후 진행
+                    praiseMessageArea.textContent = `작성 완료! ${roundCount}회차 룰렛을 돌려보세요.`;
+                    
+                    submitBtn.disabled = true;
+                    spinBtn.disabled = false;
                 });
 
-                const json = await response.json();
-                
-                if (json.result === true) {
-                    const data = json.data;
-                    transitionToDashboard(data.name, data.totalCookie, false);
-                } else {
-                    alert(`로그인 실패: ${json.message || 'API 키 또는 학생 코드를 확인해주세요.'}`);
-                    console.error('API Error:', json.message);
-                }
+                spinBtn.addEventListener('click', spinRoulette);
 
-            } catch (error) {
-                alert('API 호출 중 오류 발생. 브라우저 보안 설정(CORS)을 확인하거나 개발자 환경에서 실행해 주세요. (F12 콘솔 확인)');
-                console.error("Fetch Error:", error);
-            }
-        }
-        
-        // =================================================================
-        // 3. 칭찬글 제출 로직
-        // =================================================================
-        praiseForm.addEventListener('submit', (event) => {
-            event.preventDefault(); 
-            
-            if (roundCount > MAX_ROUNDS) {
-                alert('이미 2회의 칭찬글 작성 기회를 모두 사용했습니다.');
-                return;
-            }
-            
-            const who = document.getElementById('who').value.trim();
-            const when = document.getElementById('when').value.trim();
-            const what = document.getElementById('what').value.trim();
-            
-            if (!who || !when || !what) {
-                alert('필수 항목(누가, 언제, 무엇을)을 모두 입력해주세요.');
-                return;
-            }
-
-            alert(`${roundCount}회차 칭찬글이 성공적으로 작성되었습니다! 이제 룰렛을 돌려보세요.`);
-
-            submitBtn.disabled = true;
-            spinBtn.disabled = false;
-            resultDisplay.textContent = '룰렛 돌리기 버튼을 눌러주세요!';
-        });
-
-        // =================================================================
-        // 4. 룰렛 돌리기 로직 (애니메이션 적용)
-        // =================================================================
-        function spinRoulette() {
-            spinBtn.disabled = true;
-            
-            const rewards = [
-                { amount: 0, label: '꽝!', probability: 40, index: 0 },
-                { amount: 1, label: '쿠키 +1', probability: 35, index: 1 },
-                { amount: 2, label: '쿠키 +2', probability: 25, index: 2 }
-            ];
-
-            const reward = getRouletteResult(rewards);
-            const cookieAmount = reward.amount;
-            
-            resultDisplay.textContent = '... 룰렛 돌아가는 중 ...';
-            rewardOptions.classList.add('spinning'); // 애니메이션 시작
-
-            // 1.5초 후 애니메이션 멈추고 결과 표시
-            setTimeout(() => {
-                rewardOptions.classList.remove('spinning'); // 애니메이션 중지
-                
-                // 쿠키 업데이트 (화면 및 총 점수 업데이트)
-                currentTotalCookie += cookieAmount;
-                totalAcquiredCookies += cookieAmount;
-                
-                // 결과 표시
-                resultDisplay.textContent = `[${roundCount}회차] 결과: ${reward.label}!!`;
-                resultDisplay.style.color = (cookieAmount > 0) ? '#00A86B' : '#C0392B';
-                
-                cookiesDisplay.textContent = currentTotalCookie;
-                
-                // 횟수 증가
-                roundCount++;
-
-                // 다음 라운드 또는 최종 점수 표시
-                setTimeout(() => {
-                    if (roundCount <= MAX_ROUNDS) {
-                        praiseForm.reset();
-                        submitBtn.disabled = false;
-                        resultDisplay.textContent = '';
-                        updateRoundCount();
-                    } else {
-                        updateRoundCount();
-                    }
-                }, 3000);
-            }, 1500);
-        }
-
-        /**
-         * 룰렛 확률 기반으로 결과를 계산하는 함수
-         */
-        function getRouletteResult(rewards) {
-            let totalProbability = 0;
-            rewards.forEach(reward => totalProbability += reward.probability);
-
-            const randomNum = Math.random() * totalProbability;
-            let cumulativeProbability = 0;
-
-            for (const reward of rewards) {
-                cumulativeProbability += reward.probability;
-                if (randomNum < cumulativeProbability) {
-                    return reward;
-                }
-            }
-            return rewards[0]; 
-        }
+            }); // DOMContentLoaded 끝
+        })(); // IIFE 끝
 
     </script>
 </body>
